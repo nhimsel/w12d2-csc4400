@@ -1,5 +1,5 @@
 class RevPolish{
-    static MyQueue<String> toRevPolish(String inString) 
+    static MyQueue<String> toRevPolish(String inString)
             throws NonExistentOperatorException, UnbalancedParentheseesException{
         char[] in = inString.toCharArray();
 
@@ -9,81 +9,80 @@ class RevPolish{
         int numStart = 0;
         int curNum = 0;
         boolean wasInt = false;
+        boolean isNegative = false;
 
-        String fin;
-        
-        while (curNum<in.length){
-            //System.out.println(in[curNum]+"\t"+numStart+"\t"+curNum);
-            if (isInt(in[curNum])){
+        while (curNum < in.length) {
+            if (isInt(in[curNum]) || (isNegative && in[curNum] == '0')) {
                 //it's a number
-                curNum++; 
-                wasInt=true;
+                curNum++;
+                wasInt = true;
+            } else if (in[curNum] == '-' && (curNum == 0 || isOperator(in[curNum - 1]) || in[curNum - 1] == '(')) {
+                //handle negatives 
+                isNegative = true;
+                curNum++;
             } else {
                 //parse last number
-                if (wasInt){
-                    out.enqueue(parseInt(in, numStart, curNum));
-                    wasInt=false;
+                if (wasInt) {
+                    out.enqueue(parseInt(in, numStart, curNum, isNegative));
+                    wasInt = false;
+                    isNegative = false;
                 }
 
                 //parse operator
                 char opr;
-                try{
+                try {
                     opr = parseOpr(in, curNum);
-                } catch (NonExistentOperatorException e){
+                } catch (NonExistentOperatorException e) {
                     throw e;
                 }
 
                 //handle operator
                 try {
-                    handleOpr(opr, op, out); 
-                } catch (UnbalancedParentheseesException e){
+                    handleOpr(opr, op, out);
+                } catch (UnbalancedParentheseesException e) {
                     throw e;
                 }
 
                 curNum++;
-                numStart=curNum;
+                numStart = curNum;
             }
-            //System.out.println("\t"+numStart+"\t"+curNum);
         }
 
+        //enqueue if last num was int
         if (wasInt) {
-            //ensure last num is caught
-            out.enqueue(parseInt(in, numStart, curNum));
-            //ensure all operators are popped
-            while (op.head!=null){
-                if(op.peek()!='(') {
-                    out.enqueue(op.pop()+"");
-                } else {
-                    throw new UnbalancedParentheseesException("unmatched "+')');
-                }
-            }
+            out.enqueue(parseInt(in, numStart, curNum, isNegative));
         }
 
-        /* is this needed?
-         else {
-            char opr;
-            try {
-                opr = parseOpr(in, numStart); 
-            } catch (NonExistentOperatorException e) {
-                throw e;
+        //ensure all operators are popped
+        while (op.peek() != null) {
+            if (op.peek() != '(') {
+                out.enqueue(op.pop() + "");
+            } else {
+                throw new UnbalancedParentheseesException("unmatched " + ')');
             }
-            handleOpr(opr, op, out);
-        }*/
+        }
 
         return out;
-        //return toString(out);
     }
 
-    private static String parseInt(char[] in, int start, int end){
+    private static String parseInt(char[] in, int start, int end, boolean isNegative) {
         String s = new String();
-        while (start<end){
-            s+=in[start++];
+        while (start < end) {
+            s += in[start++];
         }
         return s;
     }
 
+    private static boolean isInt(char c) {
+        return '0' <= c && c <= '9';
+    }
+
+    private static boolean isOperator(char c) {
+        return c == '+' || c == '-' || c == '*' || c == '/' || c == '%' || c == '(' || c == ')';
+    }
+
     private static char parseOpr(char[] in, int idx)
-            throws NonExistentOperatorException{
+            throws NonExistentOperatorException {
         char op;
         try {
             op = getOperator(in[idx]);
@@ -95,35 +94,29 @@ class RevPolish{
     }
 
     private static void handleOpr(char opr, MyStack<Character> stack,
-            MyQueue<String> queue) throws UnbalancedParentheseesException{
-        if (opr!=')'){
+            MyQueue<String> queue) throws UnbalancedParentheseesException {
+        if (opr != ')') {
             //push if not ')'
-            while (stack.peek()!=null && getPrecidence(opr, stack.peek())){
-                queue.enqueue(stack.pop()+"");
+            while (stack.peek() != null && getPrecidence(opr, stack.peek())) {
+                queue.enqueue(stack.pop() + "");
             }
             stack.push(opr);
         } else {
             //pop everything before '(' into queue
             while (stack.peek() != '(') {
-                queue.enqueue(stack.pop()+"");
+                queue.enqueue(stack.pop() + "");
             }
             if (stack.peek() == null) {
                 //there was no '(' to match the ')'
-                System.out.println(queueToString(queue));
-                throw new UnbalancedParentheseesException("unmatched "+')');
+                throw new UnbalancedParentheseesException("unmatched " + ')');
             }
             //next val should be '('
             stack.pop();
         }
     }
 
-    private static boolean isInt(char c){
-        if ('0'<=c && c<='9') return true;
-        return false;
-    }
-
-    private static char getOperator(char c) throws NonExistentOperatorException{
-        switch(c){
+    private static char getOperator(char c) throws NonExistentOperatorException {
+        switch (c) {
             case '+':
             case '-':
             case '*':
@@ -133,18 +126,18 @@ class RevPolish{
             case ')':
                 return c;
             default:
-                throw new NonExistentOperatorException(c+" is not a valid operator.");
+                throw new NonExistentOperatorException(c + " is not a valid operator.");
         }
     }
 
-    //return true if prev has higher precidence, false if not
-    private static boolean getPrecidence(char c, char prev){
-        if (prev=='(') return false;
-        return (precidence(prev)>=precidence(c));
+    //return true if prev has higher precedence, false if not
+    private static boolean getPrecidence(char c, char prev) {
+        if (prev == '(') return false;
+        return (precidence(prev) >= precidence(c));
     }
 
-    private static int precidence(char c){
-        switch(c){
+    private static int precidence(char c) {
+        switch (c) {
             case '+':
             case '-':
                 return 1;
@@ -157,10 +150,16 @@ class RevPolish{
         }
     }
 
-    public static String queueToString(MyQueue<String> queue){
-        String s=queue.dequeue();
-        while(queue.head!=null){
-            s+=","+queue.dequeue();
+    public static String queueToString(MyQueue<String> queue) {
+        if (queue.front() == null) return "";
+        String s = "";
+        String tmp = "";
+        while (queue.head != null) {
+            tmp = queue.dequeue();
+            if (tmp.length() > 1) {
+                tmp = '('+tmp+')';
+            }
+            s+=tmp;
         }
         return s;
     }

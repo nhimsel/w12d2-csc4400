@@ -40,13 +40,12 @@ class Main{
         tests.enqueue("-7^32/43");
         //(-7)(32)^43/ ~=-2.568
 
-
         try{
             while (tests.front()!=null){
                 String test=tests.dequeue();
                 System.out.println(test);
                 MyQueue<String> out = RevPolish.toRevPolish(test);
-                //System.out.println(RevPolish.queueToString(out, true));
+                System.out.println(RevPolish.queueToString(out, true));
                 double ans = RPNEval.Eval(out);
                 System.out.println(ans+"\n");
             }

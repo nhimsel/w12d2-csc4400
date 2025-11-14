@@ -157,12 +157,14 @@ class RevPolish{
         if (queue.front() == null) return "";
         String s = "";
         String tmp = "";
-        while (queue.head != null) {
-            tmp = queue.dequeue();
+        DoublyLinkedList.Node curNode = queue.tail;
+        while (curNode != null) {
+            tmp = curNode.obj+"";
             if (tmp.length() > 1) {
                 tmp = '('+tmp+')';
             }
             s+=tmp;
+            curNode = curNode.prv;
         }
         return s;
     }

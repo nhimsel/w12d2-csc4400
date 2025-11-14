@@ -86,4 +86,44 @@ class RPNEval{
         }
         return isNeg ? sol*-1 : sol;
     }
+
+    //parse a string already in RPN into a queue for evaluation
+    //delimiter must separate every value, both number and operator
+    static double Eval(String s, char delimiter)
+        throws NonExistentOperatorException{
+        MyQueue<String> queue = new MyQueue<String>();
+        MyQueue<Character> charQueue = new MyQueue<Character>();
+
+        char[] str = s.toCharArray();
+        int queueHeight= 0;
+
+        //parse string to queue
+        for (int i=0; i<str.length; i++){
+            if (str[i]!=delimiter){
+                charQueue.enqueue(str[i]);
+                queueHeight++;
+            } else {
+                //delimiter
+                char[] tmp = new char[queueHeight];
+                for (int j=0; j<queueHeight; j++){
+                    tmp[j]=charQueue.dequeue();
+                }
+                queue.enqueue(new String(tmp));
+                queueHeight=0;
+            }
+        }
+        //handle last object
+        char[] tmp = new char[queueHeight];
+        for (int i=0; i<queueHeight; i++){
+            tmp[i]=charQueue.dequeue();
+        }
+        queue.enqueue(new String(tmp));
+
+        //evaluate expression
+        try {
+            return Eval(queue);
+        } catch (NonExistentOperatorException e){
+            throw e;
+        }
+    }
 }

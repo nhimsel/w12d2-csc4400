@@ -1,5 +1,18 @@
 class Main{
     public static void main(String[] args){
+        /*
+        try {
+            String test1 = "(3+4)*2/(1-5)";
+            MyQueue<String> test1out = RevPolish.toRevPolish(test1);
+            System.out.println(RPNEval.Eval(test1out));
+
+            String test2 = "3 4 + 2 * 1 5 - /";
+            System.out.println(RPNEval.Eval(test2, ' '));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        */
+
         MyQueue<String> tests = new MyQueue<String>();
 
         tests.enqueue("(3+4)*2/(1-5)");
@@ -27,12 +40,13 @@ class Main{
         tests.enqueue("-7^32/43");
         //(-7)(32)^43/ ~=-2.568
 
+
         try{
             while (tests.front()!=null){
                 String test=tests.dequeue();
                 System.out.println(test);
                 MyQueue<String> out = RevPolish.toRevPolish(test);
-                System.out.println(RevPolish.queueToString(out, true));
+                //System.out.println(RevPolish.queueToString(out, true));
                 double ans = RPNEval.Eval(out);
                 System.out.println(ans+"\n");
             }

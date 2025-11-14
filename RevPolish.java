@@ -36,11 +36,14 @@ class RevPolish{
                     throw e;
                 }
 
-                //handle operator
-                try {
-                    handleOpr(opr, op, out);
-                } catch (UnbalancedParentheseesException e) {
-                    throw e;
+                //ignore space
+                if (opr != ' '){ 
+                    //handle operator
+                    try {
+                        handleOpr(opr, op, out);
+                    } catch (UnbalancedParentheseesException e) {
+                        throw e;
+                    }
                 }
 
                 curNum++;
@@ -125,6 +128,8 @@ class RevPolish{
             case '(':
             case ')':
             case '^':
+            //need space so we can ignore it later
+            case ' ':
                 return c;
             default:
                 throw new NonExistentOperatorException(c + " is not a valid operator.");
@@ -153,18 +158,28 @@ class RevPolish{
         }
     }
 
-    public static String queueToString(MyQueue<String> queue) {
+    //if spaces, a space is placed between arguments. else, parens around args>1 char
+    public static String queueToString(MyQueue<String> queue, boolean spaces) {
         if (queue.front() == null) return "";
         String s = "";
         String tmp = "";
         DoublyLinkedList.Node curNode = queue.tail;
-        while (curNode != null) {
-            tmp = curNode.obj+"";
-            if (tmp.length() > 1) {
-                tmp = '('+tmp+')';
+        if (spaces) {
+            s = curNode.obj+"";
+            curNode=curNode.prv;
+            while (curNode!=null) {
+                s+=" "+curNode.obj;
+                curNode=curNode.prv;
             }
-            s+=tmp;
-            curNode = curNode.prv;
+        } else {
+            while (curNode != null) {
+                tmp = curNode.obj+"";
+                if (tmp.length() > 1) {
+                    tmp = '('+tmp+')';
+                }
+                s+=tmp;
+                curNode = curNode.prv;
+            }
         }
         return s;
     }

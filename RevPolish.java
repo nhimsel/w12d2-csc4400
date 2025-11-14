@@ -78,7 +78,7 @@ class RevPolish{
     }
 
     private static boolean isOperator(char c) {
-        return c == '+' || c == '-' || c == '*' || c == '/' || c == '%' || c == '(' || c == ')';
+        return c == '+' || c == '-' || c == '*' || c == '/' || c == '%' || c == '(' || c == ')' || c=='^';
     }
 
     private static char parseOpr(char[] in, int idx)
@@ -124,6 +124,7 @@ class RevPolish{
             case '%':
             case '(':
             case ')':
+            case '^':
                 return c;
             default:
                 throw new NonExistentOperatorException(c + " is not a valid operator.");
@@ -145,6 +146,8 @@ class RevPolish{
             case '/':
             case '%':
                 return 2;
+            case '^':
+                return 3;
             default:
                 return 99;
         }

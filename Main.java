@@ -15,9 +15,11 @@ class Main{
         //String test = "-5+-4*2";
         //(-5)(-4)+2*
 
-        String test = "-1+34*(5%3)/-4+(8*-7/7+3)";
+        //String test = "-1+34*(5%3)/-4+(8*-7/7+3)";
         //(-1)(34)53%*(-4)/+8(-7)*7/3++
 
+        String test = "-7^32/43";
+        //(-7)(32)^43/
         try{
             System.out.println(RevPolish.queueToString(RevPolish.toRevPolish(test)));
         } catch (Exception e){
